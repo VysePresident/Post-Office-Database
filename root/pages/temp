@@ -1,0 +1,52 @@
+<div>
+                    <span>
+                        <h5>Package Notifications</h5>
+                    </span>
+
+                    <table class="content-table">
+                        <thead>
+                            <tr>
+                                
+                                <th>Package_ID</th>
+                                <th>DateArrived</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                                // trigger: grabs the office id session and check the item_restock_notifications table
+                                // if there's a low item in stock belonging to our post office it will show it in the front-end
+                                // log in as digdug@gmail who belongs to office ID 1 and you'll see he gets back the item low in stock
+                                // belonging to PO_ID 1.
+                                $officeID = $_SESSION["officeID"];
+                                $tracksql = "SELECT * from Tracking WHERE PO_ID = ?;";
+                                $stmtTrack = mysqli_stmt_init($conn);
+                             
+                                    if (!mysqli_stmt_prepare($stmtTrack, $tracksql))
+                                    {
+                                        header("location: ../pages/index-login.php?error=stmtfailed");
+                                        exit();
+                                    }
+                                    mysqli_stmt_bind_param($stmtTrack, "i", $officeID);
+                                    mysqli_stmt_execute($stmtTrack);
+                                    
+                                    $trackStartRow = mysqli_stmt_get_result($stmtTrack);
+                                    $stmtTrack_check = mysqli_num_rows($trackStartRow);
+
+                                //Check for results
+                                if($stmtTrack_check > 0){
+                                    while($check = mysqli_fetch_assoc($trackStartRow)){
+                                        
+                                        //$dateArrived = $check['DateArrived'];
+                                        //$nowDate = date("Y-m-d H:i:s");
+
+                                        echo "<tr> 
+                                        <td>" . $check['Package_ID'] . "</td>
+                                        <td>" . $check['DateArrived'] . "</td>
+                                        </tr>";
+
+                                    }
+                                }
+                            ?>
+                            
+                        </tbody>
+                    </table>
